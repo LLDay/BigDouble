@@ -91,8 +91,7 @@ public class BigDouble
 		pow_10 -= digitsShift + rightThrIndex * countDigits;
 	}
 
-
-	public void powShift(int expectedPow)
+	private void powShift(int expectedPow)
 	{
 		if (expectedPow < pow_10)
 			throw new IllegalArgumentException("Wrong shifting");
@@ -107,8 +106,8 @@ public class BigDouble
 		long powEnd = getPow_10(countDigits - digitsShift);
 
 		Vector<Long> newNumber = new Vector<>();
-		newNumber.add(0L);
 
+		newNumber.add(0L);
 
 		for (int i = 0; i < numberSize; i++)
 		{
@@ -222,9 +221,19 @@ public class BigDouble
 			else result.number.add(minList.get(i) + maxList.get(i + sizeDiff));
 
 		result.zeroCleaner();
+		this.zeroCleaner();
+		_Other.zeroCleaner();
+
 		return result;
 	}
 
+	public BigDouble minus(BigDouble _Other)
+	{
+		_Other.invert();
+		BigDouble tmp = this.plus(_Other);
+		_Other.invert();
+		return tmp;
+	}
 
 	public void invert()
 	{
@@ -262,13 +271,13 @@ public class BigDouble
 	{
 		StringBuilder str = new StringBuilder();
 
-		long negShift = isNegative() ? Long.MIN_VALUE : 0;
+		if (this.isNegative())
+			str.append('-');
 
-		for (int i = 0; i < number.size() - 1; i++)
-			str.append(String.format("%0" + countDigits + "d", number.get(i) + negShift));
+		str.append(Math.abs(number.get(0)));
 
-		if (!number.isEmpty())
-			str.append(number.get(number.size() - 1) + negShift);
+		for (int i = 1; i < number.size(); i++)
+			str.append(String.format("%0" + countDigits + "d", Math.abs(number.get(i))));
 
 		String strResult = str.toString();
 		int strLength = strResult.length();
@@ -304,7 +313,7 @@ public class BigDouble
 	{
 		BigDouble a = new BigDouble("0000000051561651516510054006001325.400001000000000000000");
 		BigDouble b = new BigDouble("2.78");
-		System.out.println(a.plus(b));
+		System.out.println(a.minus(b));
 	}
 }
 
