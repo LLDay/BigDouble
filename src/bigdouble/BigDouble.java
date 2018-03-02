@@ -2,6 +2,7 @@ package bigdouble;
 
 
 import java.lang.IllegalArgumentException;
+import java.util.ListIterator;
 import java.util.Vector;
 
 
@@ -25,20 +26,6 @@ public class BigDouble
 		return digits;
 	}
 
-	private static int getDotPosition(String str)
-	{
-		int dotIndex = str.indexOf('.');
-		if (dotIndex == -1) return 0;
-
-		final int strLength = str.length();
-		int zeroRight = strLength - 1;
-
-		if (str.charAt(zeroRight) == '0')
-			while (zeroRight >= 0 && str.charAt(zeroRight) == '0')
-				zeroRight--;
-
-		return zeroRight - dotIndex;
-	}
 
 	private int getNumberSize()
 	{
@@ -51,10 +38,59 @@ public class BigDouble
 		return (long)Math.pow(10, e);
 	}
 
-	private int getDotPosition()
+
+	private void zeroCleaner()
 	{
-		return getNumberSize() - pow_10;
+		//---Right------------------------------------------------>
+		ListIterator<Long> it = number.listIterator(number.size());
+
+		int rightThrIndex = 0;
+		while (it.hasPrevious() && it.previous() == 0)
+			rightThrIndex++;
+
+		int digitsShift = 0;
+		int rightNonZeroIndex = number.size() - rightThrIndex - 1;
+		long rightNonZeroElem = number.get(rightNonZeroIndex);
+
+		while (rightNonZeroElem % 10 == 0)
+		{
+			rightNonZeroElem /= 10;
+			digitsShift++;
+		}
+
+
+		//---Shifting-------------------------->
+		Vector<Long> newNumber = new Vector<>();
+
+		if (digitsShift != 0)
+		{
+			long powRight = getPow_10(digitsShift);
+			long powLeft = getPow_10(countDigits - digitsShift);
+
+			newNumber.add(number.get(0) / powRight);
+
+			for (int i = 1; i <= rightNonZeroIndex; i++)
+			{
+				long prev = number.get(i - 1);
+				long next = number.get(i);
+				newNumber.add((prev % powRight) * powLeft + next / powRight);
+			}
+		}
+		else
+			newNumber = number;
+
+		//---Left-------------------->
+		it = newNumber.listIterator();
+
+		int leftThrIndex = 0;
+		while (it.hasNext() && it.next() == 0)
+			leftThrIndex++;
+
+		//---Filling----------------------------------------------------------------->
+		number = new Vector<>(newNumber.subList(leftThrIndex, rightNonZeroIndex + 1));
+		pow_10 -= digitsShift + rightThrIndex * countDigits;
 	}
+
 
 	public void powShift(int expectedPow)
 	{
@@ -66,7 +102,7 @@ public class BigDouble
 
 
 		int numberSize = number.size();
-		int digitsShift = expectedPow % countDigits;
+		int digitsShift = (expectedPow - pow_10) % countDigits;
 		long powBeg = getPow_10(digitsShift);
 		long powEnd = getPow_10(countDigits - digitsShift);
 
@@ -100,34 +136,12 @@ public class BigDouble
 			throw new IllegalArgumentException("Wrong format of string");
 
 		boolean isNeg = str.charAt(0) == '-';
-		pow_10 = getDotPosition(str);
+		pow_10 = str.length() - str.indexOf('.') - 1;
 		String inputString = str.replaceAll("[-.]", "");
 
 
-		//---Zero cleaner--------------------------->
+		//---Filling-------------------------------->
 		int inputStringLength = inputString.length();
-		int zeroLeft = 0;
-		while (zeroLeft < inputStringLength - 1 && str.charAt(zeroLeft) == '0')
-			zeroLeft++;
-
-		int zeroRight = inputStringLength - 1;
-		if (pow_10 != 0)
-		{
-			if (str.charAt(zeroRight) == '0')
-				while (zeroRight > zeroLeft && str.charAt(zeroRight) == '0')
-					zeroRight--;
-		}
-
-		if (zeroLeft != 0 || zeroRight != inputStringLength - 1)
-		{
-			inputString = inputString.substring(zeroLeft, zeroRight);
-			if (inputString.isEmpty())
-				inputString = "0";
-			inputStringLength = inputString.length();
-		}
-
-
-		//---Filling--------------------------------->
 		int leftThr = inputStringLength % countDigits;
 
 		if (leftThr != 0)
@@ -145,6 +159,8 @@ public class BigDouble
 									leftThr, nextThr)));
 			leftThr = nextThr;
 		}
+
+		zeroCleaner();
 
 		//---Is negative--->>
 		if (isNeg)
@@ -205,6 +221,7 @@ public class BigDouble
 			}
 			else result.number.add(minList.get(i) + maxList.get(i + sizeDiff));
 
+		result.zeroCleaner();
 		return result;
 	}
 
@@ -285,8 +302,8 @@ public class BigDouble
 
 	public static void main(String[] args)
 	{
-		BigDouble a = new BigDouble("5641615641654611564.12345");
-		BigDouble b = new BigDouble("2");
+		BigDouble a = new BigDouble("0000000051561651516510054006001325.400001000000000000000");
+		BigDouble b = new BigDouble("2.78");
 		System.out.println(a.plus(b));
 	}
 }
