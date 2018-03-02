@@ -46,9 +46,51 @@ public class BigDouble
 		return sizeFirst + (number.size() - 1) * countDigits;
 	}
 
+	private long getPow_10(long e)
+	{
+		return (long)Math.pow(10, e);
+	}
+
 	private int getDotPosition()
 	{
 		return getNumberSize() - pow_10;
+	}
+
+	public void powShift(int expectedPow)
+	{
+		if (expectedPow < pow_10)
+			throw new IllegalArgumentException("Wrong shifting");
+
+		if (expectedPow == pow_10)
+			return;
+
+
+		int numberSize = number.size();
+		int digitsShift = expectedPow % countDigits;
+		long powBeg = getPow_10(digitsShift);
+		long powEnd = getPow_10(countDigits - digitsShift);
+
+		Vector<Long> newNumber = new Vector<>();
+		newNumber.add(0L);
+
+
+		for (int i = 0; i < numberSize; i++)
+		{
+			long numb = number.get(i);
+
+			if (getCountDigits(numb) + digitsShift > countDigits)
+			{
+				newNumber.set(i, newNumber.get(i) + numb / powBeg);
+				newNumber.add((numb % powBeg) * powEnd);
+			}
+			else newNumber.set(i, newNumber.get(i) + numb * powBeg);
+		}
+
+		for (int i = 0; i < expectedPow / countDigits; i++)
+			newNumber.add(0L);
+
+		this.number = newNumber;
+		this.pow_10 = expectedPow;
 	}
 
 
@@ -122,40 +164,49 @@ public class BigDouble
 		number.add(value);
 	}
 
-	//---Arithmetic---------------------->>
+
 	public BigDouble plus(BigDouble _Other)
 	{
 		BigDouble result = new BigDouble();
-		if (this.pow_10 == _Other.pow_10)
+
+		//---Alignment----------------------------------->
+		int maxPow = Math.max(this.pow_10, _Other.pow_10);
+		if (this.pow_10 >= _Other.pow_10)
+			_Other.powShift(this.pow_10);
+		else this.powShift(_Other.pow_10);
+
+		result.pow_10 = maxPow;
+
+		Vector<Long> maxList;
+		Vector<Long> minList;
+
+		if (this.number.size() > _Other.number.size())
 		{
-			result.pow_10 = pow_10;
-
-			Vector<Long> maxList;
-			Vector<Long> minList;
-
-			if (this.number.size() > _Other.number.size())
-			{
-				maxList = this.number;
-				minList = _Other.number;
-			}
-			else
-			{
-				maxList = _Other.number;
-				minList = this.number;
-			}
-
-			final long isPossiblePositive = minList.get(0) > 0 ? 1 : -1;
-			final int minListSize = minList.size();
-			for (int i = 0; i < minListSize; i++)
-				if (Math.abs((minList.get(0) / 2) + (maxList.get(0) / 2)) > Long.MAX_VALUE / 2)
-				{
-					result.number.set(i, result.number.lastElement() + isPossiblePositive);
-					result.number.add((-isPossiblePositive * Long.MAX_VALUE + minList.get(i)) + maxList.get(0));
-				}
-				else result.number.add(minList.get(i) + maxList.get(i));
-
-			result.number.addAll(minListSize, maxList);
+			maxList = this.number;
+			minList = _Other.number;
 		}
+		else
+		{
+			maxList = _Other.number;
+			minList = this.number;
+		}
+
+		final long isPossiblePositive = minList.get(0) > 0 ? 1 : -1;
+		final int minListSize = minList.size();
+		for (int i = 0; i < minListSize; i++)
+			if (Math.abs((minList.get(0) / 2) + (maxList.get(0) / 2)) > Long.MAX_VALUE / 2)
+			{
+				result.number.set(i, result.number.lastElement() + isPossiblePositive);
+				result.number.add((-isPossiblePositive * Long.MAX_VALUE + minList.get(i)) + maxList.get(0));
+			}
+			else result.number.add(minList.get(i) + maxList.get(i));
+
+		final long maxListSize = maxList.size();
+		for (int i = minListSize; i < maxListSize; i++)
+		{
+			result.number.add(maxList.get(i));
+		}
+
 		return result;
 	}
 
@@ -198,7 +249,6 @@ public class BigDouble
 
 		long negShift = isNegative() ? Long.MIN_VALUE : 0;
 
-
 		for (int i = 0; i < number.size() - 1; i++)
 			str.append(String.format("%0" + countDigits + "d", number.get(i) + negShift));
 
@@ -237,9 +287,9 @@ public class BigDouble
 
 	public static void main(String[] args)
 	{
-		BigDouble a = new BigDouble("-1");
-		System.out.println(a);
-
+		BigDouble a = new BigDouble("1564.55");
+		BigDouble b = new BigDouble("2436");
+		System.out.println(a.plus(b));
 	}
 }
 
