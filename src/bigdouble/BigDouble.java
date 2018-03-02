@@ -5,11 +5,11 @@ import java.lang.IllegalArgumentException;
 import java.util.Vector;
 
 
-/************************************************************
- *A number is stored in array of long integer                *
- *"1011121314151617181920.12345678910" is                    *
- *{[10112], [13141], [51617], [18192], [01234], [56789], [1]}*
- ************************************************************/
+/***************************************************************
+ * A number is stored in array of long integer				   *
+ * "1011121314151617181920.12345678910" is			 		   *
+ * {[10], [11121], [31415], [16171],[81920], [12345], [67891]} *
+ **************************************************************/
 
 
 public class BigDouble
@@ -127,27 +127,24 @@ public class BigDouble
 		}
 
 
-		//---Filling-------------------------------------------->
-		for (int i = 0; i < inputStringLength / countDigits; i++)
+		//---Filling--------------------------------->
+		int leftThr = inputStringLength % countDigits;
+
+		if (leftThr != 0)
+			number.add(
+					Long.parseLong(
+							inputString.substring(
+									0, leftThr)));
+
+		while (leftThr < inputStringLength)
 		{
-			int leftThr = i * countDigits;
-			int rightThr = Math.min((i + 1) * countDigits, inputStringLength);
+			int nextThr = leftThr + countDigits;
 			number.add(
 					Long.parseLong(
 							inputString.substring(
-									leftThr, rightThr)));
+									leftThr, nextThr)));
+			leftThr = nextThr;
 		}
-
-		//---Last iteration----------------->>
-		int i = inputStringLength / countDigits;
-		int leftThr = i * countDigits;
-		int rightThr = Math.min((i + 1) * countDigits, inputStringLength);
-
-		if (leftThr != rightThr)
-			number.add(
-					Long.parseLong(
-							inputString.substring(
-									leftThr, rightThr)));
 
 		//---Is negative--->>
 		if (isNeg)
@@ -191,21 +188,22 @@ public class BigDouble
 			minList = this.number;
 		}
 
+
 		final long isPossiblePositive = minList.get(0) > 0 ? 1 : -1;
 		final int minListSize = minList.size();
+		final int maxListSize = maxList.size();
+		final int sizeDiff = maxListSize - minListSize;
+
+		for (int i = 0; i < sizeDiff; i++)
+			result.number.add(maxList.get(i));
+
 		for (int i = 0; i < minListSize; i++)
-			if (Math.abs((minList.get(0) / 2) + (maxList.get(0) / 2)) > Long.MAX_VALUE / 2)
+			if (Math.abs((minList.get(i) / 2) + (maxList.get(i + sizeDiff) / 2)) > Long.MAX_VALUE / 2)
 			{
 				result.number.set(i, result.number.lastElement() + isPossiblePositive);
-				result.number.add((-isPossiblePositive * Long.MAX_VALUE + minList.get(i)) + maxList.get(0));
+				result.number.add((-isPossiblePositive * Long.MAX_VALUE + minList.get(i)) + maxList.get(i + sizeDiff));
 			}
-			else result.number.add(minList.get(i) + maxList.get(i));
-
-		final long maxListSize = maxList.size();
-		for (int i = minListSize; i < maxListSize; i++)
-		{
-			result.number.add(maxList.get(i));
-		}
+			else result.number.add(minList.get(i) + maxList.get(i + sizeDiff));
 
 		return result;
 	}
@@ -287,8 +285,8 @@ public class BigDouble
 
 	public static void main(String[] args)
 	{
-		BigDouble a = new BigDouble("1564.55");
-		BigDouble b = new BigDouble("2436");
+		BigDouble a = new BigDouble("5641615641654611564.12345");
+		BigDouble b = new BigDouble("2");
 		System.out.println(a.plus(b));
 	}
 }
