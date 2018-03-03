@@ -128,6 +128,7 @@ public class Test
 		BigDouble a = new BigDouble("101998877665544332211.112233445566778899");
 		BigDouble b = new BigDouble("909112233445566778899.998877665544332211");
 		BigDouble c = new BigDouble("-561908403154187.51302498032168045341321");
+		BigDouble d = new BigDouble("99999999.99999999");
 		BigDouble minus = new BigDouble(-1);
 		BigDouble zero = new BigDouble();
 
@@ -139,6 +140,8 @@ public class Test
 				"321732098387541709777903741240815689"));
 		assertTrue(b.multiply(c).toString().equals("-510837803383335370497109744599955802." +
 				"89128622771707455487405029739654509590731"));
+		System.out.println(d.multiply(d));
+		assertTrue(d.multiply(d).toString().equals("9999999999999998.0000000000000001"));
 
 		assertTrue(a.multiply(zero).equals(zero));
 		assertTrue(a.multiply(minus).equals(negativeA));
