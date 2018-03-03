@@ -291,17 +291,17 @@ public class BigDouble
 			secondNum.add(el % thr);
 		}
 
-		int zeroThisNum = 0;
+		int zeroFirstNum = 0;
 		for (Long el : firstNum)
 			if (el == 0)
-				zeroThisNum++;
+				zeroFirstNum++;
 
-		int zeroOtherNum = 0;
+		int zeroSecondNum = 0;
 		for (Long el : secondNum)
 			if (el == 0)
-				zeroOtherNum++;
+				zeroSecondNum++;
 
-		if (zeroOtherNum > zeroThisNum)
+		if (zeroSecondNum > zeroFirstNum)
 		{
 			Vector<Long> tmp = firstNum;
 			firstNum = secondNum;
