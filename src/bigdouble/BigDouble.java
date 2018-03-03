@@ -27,14 +27,7 @@ public class BigDouble
 		return digits;
 	}
 
-
-	private int getNumberSize()
-	{
-		int sizeFirst = getCountDigits(number.get(0));
-		return sizeFirst + (number.size() - 1) * countDigits;
-	}
-
-	private long pow10(long e)
+	private static long pow10(long e)
 	{
 		if (e < 0)
 			throw new IllegalArgumentException("Unacceptable power");
