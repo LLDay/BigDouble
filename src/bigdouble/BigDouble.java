@@ -5,12 +5,13 @@ import java.lang.IllegalArgumentException;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import static java.lang.Math.*;
 
-/***************************************************************
- * A number is stored in array of long integer				   *
- * "1011121314151617181920.12345678910" is			 		   *
- * {[10], [11121], [31415], [16171],[81920], [12345], [67891]} *
- **************************************************************/
+/**
+A number is stored in array of long integer
+"1011121314151617181920.12345678910" is
+{[10], [11121], [31415], [16171],[81920], [12345], [67891]}
+*/
 
 
 public class BigDouble
@@ -33,9 +34,16 @@ public class BigDouble
 		return sizeFirst + (number.size() - 1) * countDigits;
 	}
 
-	private long getPow_10(long e)
+	private long pow10(long e)
 	{
-		return (long)Math.pow(10, e);
+		if (e < 0)
+			throw new IllegalArgumentException("Unacceptable power");
+
+		long result = 1;
+		for (int i = 0; i < e; i++)
+			result *= 10;
+
+		return result;
 	}
 
 
@@ -50,6 +58,15 @@ public class BigDouble
 
 		int digitsShift = 0;
 		int rightNonZeroIndex = number.size() - rightThrIndex - 1;
+
+		if (rightNonZeroIndex < 0)
+		{
+			number = new Vector<>();
+			number.add(0L);
+			shift = 0;
+			return;
+		}
+
 		long rightNonZeroElem = number.get(rightNonZeroIndex);
 
 		while (rightNonZeroElem % 10 == 0)
@@ -64,8 +81,8 @@ public class BigDouble
 
 		if (digitsShift != 0)
 		{
-			long powRight = getPow_10(digitsShift);
-			long powLeft = getPow_10(countDigits - digitsShift);
+			long powRight = pow10(digitsShift);
+			long powLeft = pow10(countDigits - digitsShift);
 
 			newNumber.add(number.get(0) / powRight);
 
@@ -88,44 +105,42 @@ public class BigDouble
 
 		//---Filling----------------------------------------------------------------->
 		number = new Vector<>(newNumber.subList(leftThrIndex, rightNonZeroIndex + 1));
-		pow_10 -= digitsShift + rightThrIndex * countDigits;
+		shift -= digitsShift + rightThrIndex * countDigits;
 	}
 
-	private void powShift(int expectedPow)
+	private void changeShift(int expectedPow)
 	{
-		if (expectedPow < pow_10)
+		if (expectedPow < shift)
 			throw new IllegalArgumentException("Wrong shifting");
 
-		if (expectedPow == pow_10)
+		if (expectedPow == shift)
 			return;
 
 
-		int numberSize = number.size();
-		int digitsShift = (expectedPow - pow_10) % countDigits;
-		long powBeg = getPow_10(digitsShift);
-		long powEnd = getPow_10(countDigits - digitsShift);
+		final int numberSize = number.size();
+		final int digitsShift = (expectedPow - shift) % countDigits;
+		final long powRight = pow10(digitsShift);
+		final long powLeft = pow10(countDigits - digitsShift);
 
 		Vector<Long> newNumber = new Vector<>();
-
-		newNumber.add(0L);
+		if (getCountDigits(number.get(0)) + digitsShift >= countDigits)
+			newNumber.add((number.get(0) / powRight) * powRight);
+		else
+			newNumber.add(0L);
 
 		for (int i = 0; i < numberSize; i++)
 		{
 			long numb = number.get(i);
 
-			if (getCountDigits(numb) + digitsShift > countDigits)
-			{
-				newNumber.set(i, newNumber.get(i) + numb / powBeg);
-				newNumber.add((numb % powBeg) * powEnd);
-			}
-			else newNumber.set(i, newNumber.get(i) + numb * powBeg);
+			newNumber.set(newNumber.size() - 1, newNumber.lastElement() + numb / powLeft);
+			newNumber.add((numb % powLeft) * powRight);
 		}
 
-		for (int i = 0; i < expectedPow / countDigits; i++)
+		for (int i = 0; i < (expectedPow - shift) / countDigits; i++)
 			newNumber.add(0L);
 
 		this.number = newNumber;
-		this.pow_10 = expectedPow;
+		this.shift = expectedPow;
 	}
 
 
@@ -134,29 +149,27 @@ public class BigDouble
 		if (!str.matches("^-?(\\d+.?\\d*)|(\\d*.?\\d+)$"))
 			throw new IllegalArgumentException("Wrong format of string");
 
-		boolean isNeg = str.charAt(0) == '-';
-		pow_10 = str.length() - str.indexOf('.') - 1;
+		final boolean isNeg = str.charAt(0) == '-';
+		final int dotIndex = str.indexOf('.');
+		shift = dotIndex == -1 ? 0 : (str.length() - 1) - dotIndex;
 		String inputString = str.replaceAll("[-.]", "");
 
 
 		//---Filling-------------------------------->
-		int inputStringLength = inputString.length();
-		int leftThr = inputStringLength % countDigits;
-
-		if (leftThr != 0)
-			number.add(
-					Long.parseLong(
-							inputString.substring(
-									0, leftThr)));
+		final int inputStringLength = inputString.length();
+		int leftThr = 0;
+		int nextThr = inputStringLength % countDigits;
+		if (nextThr == 0)
+			nextThr = countDigits;
 
 		while (leftThr < inputStringLength)
 		{
-			int nextThr = leftThr + countDigits;
 			number.add(
 					Long.parseLong(
 							inputString.substring(
 									leftThr, nextThr)));
 			leftThr = nextThr;
+			nextThr += countDigits;
 		}
 
 		zeroCleaner();
@@ -173,7 +186,14 @@ public class BigDouble
 
 	public BigDouble(long value)
 	{
-		number.add(value);
+		long thr = pow10(countDigits);
+
+		//if (abs(value) > thr) is incorrect
+		//when value = Long.MIN_VALUE
+		if (value >= thr || value <= -thr)
+			number.add(value / thr);
+
+		number.add(value % thr);
 	}
 
 
@@ -181,13 +201,13 @@ public class BigDouble
 	{
 		BigDouble result = new BigDouble();
 
-		//---Alignment----------------------------------->
-		int maxPow = Math.max(this.pow_10, _Other.pow_10);
-		if (this.pow_10 >= _Other.pow_10)
-			_Other.powShift(this.pow_10);
-		else this.powShift(_Other.pow_10);
+		//---Alignment---------------------------->
+		int maxPow = max(this.shift, _Other.shift);
+		if (this.shift >= _Other.shift)
+			_Other.changeShift(this.shift);
+		else this.changeShift(_Other.shift);
 
-		result.pow_10 = maxPow;
+		result.shift = maxPow;
 
 		Vector<Long> maxList;
 		Vector<Long> minList;
@@ -203,22 +223,48 @@ public class BigDouble
 			minList = this.number;
 		}
 
-
-		final long isPossiblePositive = minList.get(0) > 0 ? 1 : -1;
 		final int minListSize = minList.size();
 		final int maxListSize = maxList.size();
 		final int sizeDiff = maxListSize - minListSize;
+		final long thr = pow10(countDigits);
 
-		for (int i = 0; i < sizeDiff; i++)
-			result.number.add(maxList.get(i));
+		if (sizeDiff != 0)
+			result.number = new Vector<>(maxList.subList(0, sizeDiff));
 
 		for (int i = 0; i < minListSize; i++)
-			if (Math.abs((minList.get(i) / 2) + (maxList.get(i + sizeDiff) / 2)) > Long.MAX_VALUE / 2)
+		{
+			long buff = maxList.get(i + sizeDiff) + minList.get(i);
+
+			if (abs(buff) > thr)
 			{
-				result.number.set(i, result.number.lastElement() + isPossiblePositive);
-				result.number.add((-isPossiblePositive * Long.MAX_VALUE + minList.get(i)) + maxList.get(i + sizeDiff));
+				result.number.set(result.number.size() - 1, result.number.lastElement() + buff / abs(buff));
+				buff %= thr;
 			}
-			else result.number.add(minList.get(i) + maxList.get(i + sizeDiff));
+
+			result.number.add(buff);
+		}
+
+		result.zeroCleaner();
+
+		boolean isPos = result.isPositive();
+		final int resultNumSize = result.number.size();
+
+		if (isPos)
+		{
+			for (int i = 1; i < resultNumSize; i++)
+				if (result.number.get(i) < 0)
+				{
+					result.number.set(i - 1, result.number.get(i - 1) - 1);
+					result.number.set(i, thr + result.number.get(i));
+				}
+		}
+		else
+			for (int i = 1; i < resultNumSize; i++)
+				if (result.number.get(i) > 0)
+				{
+					result.number.set(i - 1, result.number.get(i - 1) + 1);
+					result.number.set(i, result.number.get(i) - thr);
+				}
 
 		result.zeroCleaner();
 		this.zeroCleaner();
@@ -274,46 +320,47 @@ public class BigDouble
 		if (this.isNegative())
 			str.append('-');
 
-		str.append(Math.abs(number.get(0)));
-
+		str.append(abs(number.get(0)));
 		for (int i = 1; i < number.size(); i++)
-			str.append(String.format("%0" + countDigits + "d", Math.abs(number.get(i))));
+			str.append(String.format("%0" + countDigits + "d", abs(number.get(i))));
+
 
 		String strResult = str.toString();
-		int strLength = strResult.length();
+		final int strLength = strResult.length();
 
-		if (pow_10 <= 0)
+		if (shift == 0)
 			return strResult;
 
-		if (pow_10 > strLength)
-			return String.format("0.%0" + (pow_10 - strLength + 1) + "d", 0) + strResult;
+		if (shift < 0)
+			return strResult + String.format("%0" + (-shift) + "d", 0);
 
-		if (pow_10 == strLength)
+		if (shift > strLength)
+			return String.format("0.%0" + (shift - strLength + 1) + "d", 0) + strResult;
+
+		if (shift == strLength)
 			return "0." + strResult;
 
-		return strResult.substring(0, strLength - pow_10) + "." + strResult.substring(strLength - pow_10);
+		return strResult.substring(0, strLength - shift) + "." + strResult.substring(strLength - shift);
 	}
 
 	@Override
 	public boolean equals(Object _Obj)
 	{
-		return _Obj != null &&
-				(_Obj == this ||
-						_Obj instanceof BigDouble &&
-								this.toString().equals(_Obj.toString()));
+		if (_Obj == null)
+			return false;
+
+		if (_Obj == this)
+			return true;
+
+		if (_Obj instanceof BigDouble && toString().equals(_Obj.toString()))
+			return true;
+
+		return false;
 	}
 
-	//---Private data--------------------------------------->
-	private int countDigits = getCountDigits(Long.MAX_VALUE);
+	//---Private data-------------------------------------------------------->
+	private static final int countDigits = getCountDigits(Long.MAX_VALUE) - 1;
 	private Vector<Long> number = new Vector<>();
-	private int pow_10 = 0;
-
-
-	public static void main(String[] args)
-	{
-		BigDouble a = new BigDouble("0000000051561651516510054006001325.400001000000000000000");
-		BigDouble b = new BigDouble("2.78");
-		System.out.println(a.minus(b));
-	}
+	private int shift = 0;
 }
 
