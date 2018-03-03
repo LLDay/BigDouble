@@ -116,17 +116,12 @@ public class BigDouble
 		final long powLeft = pow10(countDigits - digitsShift);
 
 		Vector<Long> newNumber = new Vector<>();
-		if (getCountDigits(number.get(0)) + digitsShift >= countDigits)
-			newNumber.add((number.get(0) / powRight) * powRight);
-		else
-			newNumber.add(0L);
+		newNumber.add(0L);
 
-		for (int i = 0; i < numberSize; i++)
+		for (Long el : number)
 		{
-			long numb = number.get(i);
-
-			newNumber.set(newNumber.size() - 1, newNumber.lastElement() + numb / powLeft);
-			newNumber.add((numb % powLeft) * powRight);
+			newNumber.set(newNumber.size() - 1, newNumber.lastElement() + el / powLeft);
+			newNumber.add((el % powLeft) * powRight);
 		}
 
 		for (int i = 0; i < (expectedPow - shift) / countDigits; i++)
@@ -136,6 +131,12 @@ public class BigDouble
 		this.shift = expectedPow;
 	}
 
+
+	public BigDouble(BigDouble _Other)
+	{
+		this.shift = _Other.shift;
+		this.number = new Vector<>(_Other.number);
+	}
 
 	public BigDouble(String str)
 	{
@@ -157,10 +158,7 @@ public class BigDouble
 
 		while (leftThr < inputStringLength)
 		{
-			number.add(
-					Long.parseLong(
-							inputString.substring(
-									leftThr, nextThr)));
+			number.add(Long.parseLong(inputString.substring(leftThr, nextThr)));
 			leftThr = nextThr;
 			nextThr += countDigits;
 		}
@@ -274,6 +272,76 @@ public class BigDouble
 		return tmp;
 	}
 
+	public BigDouble multiply(BigDouble _Other)
+	{
+		int shortCountDigits = countDigits / 2;
+		long thr = pow10(shortCountDigits);
+
+		Vector<Long> firstNum = new Vector<>();
+		Vector<Long> secondNum = new Vector<>();
+
+		for (Long el : this.number)
+		{
+			firstNum.add(el / thr);
+			firstNum.add(el % thr);
+		}
+		for (Long el : _Other.number)
+		{
+			secondNum.add(el / thr);
+			secondNum.add(el % thr);
+		}
+
+		int zeroThisNum = 0;
+		for (Long el : firstNum)
+			if (el == 0)
+				zeroThisNum++;
+
+		int zeroOtherNum = 0;
+		for (Long el : secondNum)
+			if (el == 0)
+				zeroOtherNum++;
+
+		if (zeroOtherNum > zeroThisNum)
+		{
+			Vector<Long> tmp = firstNum;
+			firstNum = secondNum;
+			secondNum = tmp;
+		}
+
+		BigDouble result = new BigDouble();
+
+		final int firstNumSize = firstNum.size();
+		final int secondNumSize = secondNum.size();
+		final int sum = firstNumSize + secondNumSize - 2;
+
+		for (int i = 0; i < firstNumSize; i++)
+			for (int j = 0; j < secondNumSize; j++)
+			{
+				long firstElem = firstNum.get(i);
+				long secondElem = secondNum.get(j);
+
+				if (firstElem == 0)
+				{
+					if (++i == firstNumSize)
+						break;
+
+					j--;
+					continue;
+				}
+				if (secondElem == 0)
+					continue;
+
+				BigDouble tmp = new BigDouble(firstElem * secondElem);
+				tmp.shift = -shortCountDigits * (sum - (i + j));
+				result = result.plus(tmp);
+			}
+
+		result.shift = this.shift + _Other.shift;
+		result.zeroCleaner();
+		return result;
+	}
+
+
 	public void invert()
 	{
 		int numberSize = number.size();
@@ -349,6 +417,12 @@ public class BigDouble
 			return true;
 
 		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return getCountDigits(number.get(0)) + countDigits * (number.size() - 1) - shift;
 	}
 
 	//---Private data-------------------------------------------------------->

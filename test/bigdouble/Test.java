@@ -1,5 +1,9 @@
 package bigdouble;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -93,4 +97,50 @@ public class Test
 		assertTrue(b.minus(d).equals(new BigDouble("-78946513241634891566025945598936810360804.016074691680865498874161443607396261429")));
 	}
 
+	@org.junit.jupiter.api.Test
+	public void realBigDouble()
+	{
+		StringBuilder strBuild = new StringBuilder();
+		try
+		{
+			FileReader piFile = new FileReader("Pi.txt");
+			BufferedReader piBuff = new BufferedReader(piFile);
+			while (true)
+			{
+				String line = piBuff.readLine();
+				if (line == null) break;
+				strBuild.append(line);
+			}
+			piBuff.close();
+			piFile.close();
+		}
+		catch(IOException ex)
+		{
+			return;
+		}
+
+		assertFalse(isThrowingCase(strBuild.toString()));
+	}
+
+	@org.junit.jupiter.api.Test
+	public void multiply()
+	{
+		BigDouble a = new BigDouble("101998877665544332211.112233445566778899");
+		BigDouble b = new BigDouble("909112233445566778899.998877665544332211");
+		BigDouble c = new BigDouble("-561908403154187.51302498032168045341321");
+		BigDouble minus = new BigDouble(-1);
+		BigDouble zero = new BigDouble();
+
+		BigDouble negativeA = new BigDouble(a);
+		negativeA.toNegative();
+
+		//calculated by Calculator.net
+		assertTrue(a.multiply(b).toString().equals("92728427483464146389789695102918447474114." +
+				"321732098387541709777903741240815689"));
+		assertTrue(b.multiply(c).toString().equals("-510837803383335370497109744599955802." +
+				"89128622771707455487405029739654509590731"));
+
+		assertTrue(a.multiply(zero).equals(zero));
+		assertTrue(a.multiply(minus).equals(negativeA));
+	}
 }
