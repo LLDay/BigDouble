@@ -31,9 +31,22 @@ public class Test
 		assertTrue(new BigDouble().equals(zero));
 		assertTrue(new BigDouble("-0").equals(zero));
 		assertTrue(new BigDouble("00000000000.0000000000000").equals(zero));
-		assertTrue(new BigDouble("1324.").toString().equals("1324"));
-		assertTrue(new BigDouble(".1374").toString().equals("0.1374"));
-		assertTrue(new BigDouble(1234567891011121314L).toString().equals("1234567891011121314"));
+		assertTrue(new BigDouble("1324.").equals(1324));
+		assertTrue(new BigDouble(".1374").equals(0.1374));
+		assertTrue(new BigDouble(1234567891011121314L).equals(1234567891011121314L));
+		assertTrue(new BigDouble("0.00000000000000000000000001349435").
+				toString().equals("0.00000000000000000000000001349435"));
+
+		double d1 = 0.0;
+		double d2 = 123465.789126;
+		double d3 = -894531846513423.0;
+		double d4 = -0.0000000000564316845316006;
+
+		assertTrue(new BigDouble(d1).equals(zero));
+		assertTrue(new BigDouble(d2).equals(new BigDouble("123465.789126")));
+		assertTrue(new BigDouble(d3).equals(new BigDouble(-894531846513423L)));
+		assertTrue(new BigDouble(d4).toString().equals("-0.0000000000564316845316006"));
+
 
 		assertTrue(isThrowingCase(""));
 		assertTrue(isThrowingCase("."));
@@ -135,12 +148,13 @@ public class Test
 		BigDouble negativeA = new BigDouble(a);
 		negativeA.toNegative();
 
+		double d1 = 12345684651654321413184651651216548913216843216543216465460.;
+
 		//calculated by Calculator.net
 		assertTrue(a.multiply(b).toString().equals("92728427483464146389789695102918447474114." +
 				"321732098387541709777903741240815689"));
 		assertTrue(b.multiply(c).toString().equals("-510837803383335370497109744599955802." +
 				"89128622771707455487405029739654509590731"));
-		System.out.println(d.multiply(d));
 		assertTrue(d.multiply(d).toString().equals("9999999999999998.0000000000000001"));
 
 		assertTrue(a.multiply(zero).equals(zero));

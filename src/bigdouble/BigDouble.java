@@ -1,6 +1,5 @@
 package bigdouble;
 
-
 import java.lang.IllegalArgumentException;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -187,6 +186,20 @@ public class BigDouble
 		number.add(value % thr);
 	}
 
+	public BigDouble(double value)
+	{
+		String strDouble = String.valueOf(value);
+		String arrStr[] = strDouble.split("E", 2);
+
+		BigDouble tmp = new BigDouble(arrStr[0]);
+
+		if (arrStr.length == 2)
+			tmp.shift -= Integer.parseInt(arrStr[1]);
+
+		this.number = tmp.number;
+		this.shift = tmp.shift;
+		zeroCleaner();
+	}
 
 	public BigDouble plus(BigDouble _Other)
 	{
@@ -378,30 +391,27 @@ public class BigDouble
 	{
 		StringBuilder str = new StringBuilder();
 
-		if (this.isNegative())
-			str.append('-');
-
 		str.append(abs(number.get(0)));
 		for (int i = 1; i < number.size(); i++)
 			str.append(String.format("%0" + countDigits + "d", abs(number.get(i))));
 
-
 		String strResult = str.toString();
 		final int strLength = strResult.length();
+		final String negativeStr = isNegative() ? "-" : "";
 
 		if (shift == 0)
-			return strResult;
+			return negativeStr + strResult;
 
 		if (shift < 0)
-			return strResult + String.format("%0" + (-shift) + "d", 0);
+			return negativeStr + strResult + String.format("%0" + (-shift) + "d", 0);
 
 		if (shift > strLength)
-			return String.format("0.%0" + (shift - strLength + 1) + "d", 0) + strResult;
+			return negativeStr + String.format("0.%0" + (shift - strLength) + "d", 0) + strResult;
 
 		if (shift == strLength)
 			return "0." + strResult;
 
-		return strResult.substring(0, strLength - shift) + "." + strResult.substring(strLength - shift);
+		return negativeStr + strResult.substring(0, strLength - shift) + "." + strResult.substring(strLength - shift);
 	}
 
 	@Override
@@ -415,6 +425,18 @@ public class BigDouble
 
 		if (_Obj instanceof BigDouble && toString().equals(_Obj.toString()))
 			return true;
+
+		if (_Obj instanceof Long)
+			return this.equals(new BigDouble((Long)_Obj));
+
+		if (_Obj instanceof Integer)
+			return this.equals(new BigDouble(((Integer)_Obj).longValue()));
+
+		if (_Obj instanceof Double)
+			return this.equals(new BigDouble((Double)_Obj));
+
+		if (_Obj instanceof Float)
+			return this.equals(new BigDouble(((Float)_Obj).doubleValue()));
 
 		return false;
 	}
