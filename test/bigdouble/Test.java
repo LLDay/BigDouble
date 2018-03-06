@@ -53,6 +53,17 @@ public class Test
 		assertTrue(isThrowingCase("12345.123456789.123"));
 		assertTrue(isThrowingCase("123,456"));
 
+		try
+		{
+			BigDouble err = null;
+			new BigDouble(err);
+			assertTrue(false);
+		}
+		catch(NullPointerException e)
+		{
+			assertTrue(true);
+		}
+
 		assertFalse(isThrowingCase("99999999999999999999999999.99999999999999999999999999"));
 	}
 
@@ -147,8 +158,6 @@ public class Test
 
 		BigDouble negativeA = new BigDouble(a);
 		negativeA.toNegative();
-
-		double d1 = 12345684651654321413184651651216548913216843216543216465460.;
 
 		//calculated by Calculator.net
 		assertTrue(a.multiply(b).toString().equals("92728427483464146389789695102918447474114." +

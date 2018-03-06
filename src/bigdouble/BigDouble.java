@@ -6,15 +6,21 @@ import java.util.Vector;
 
 import static java.lang.Math.*;
 
+
 /**
-A number is stored in array of long integer
-"1011121314151617181920.12345678910" is
-{[10], [11121], [31415], [16171],[81920], [12345], [67891]}
-*/
-
-
+ * The class {@code BigDouble} stores a large floating number
+ * and contains a methods for working with them
+ * A number stored in array of integer number
+ * @author LLDay
+ */
 public class BigDouble
 {
+	/**
+	 * Returns count a number of digits
+	 * 0 has zero digits
+	 * @param value some {@code long} number
+	 * @return count digits of parameter
+	 */
 	private static int getCountDigits(long value)
 	{
 		int digits = 0;
@@ -26,6 +32,12 @@ public class BigDouble
 		return digits;
 	}
 
+	/**
+	 * Returns a number equal 10 to the power e
+	 * e >= 0
+	 * @param e is power
+	 * @return round number
+	 */
 	private static long pow10(long e)
 	{
 		if (e < 0)
@@ -38,7 +50,10 @@ public class BigDouble
 		return result;
 	}
 
-
+	/**
+	 * Erases zeroes from the array
+	 * on the right and left
+	 */
 	private void zeroCleaner()
 	{
 		//---Right------------------------------------------------>
@@ -100,17 +115,23 @@ public class BigDouble
 		shift -= digitsShift + rightThrIndex * countDigits;
 	}
 
-	private void changeShift(int expectedPow)
+	/**
+	 * Adds zeroes on the right
+	 * and shifts the dot to the left
+	 * Used for plus
+	 * @param expectedShift must be more than current
+	 */
+	private void changeShift(int expectedShift)
 	{
-		if (expectedPow < shift)
+		if (expectedShift < shift)
 			throw new IllegalArgumentException("Wrong shifting");
 
-		if (expectedPow == shift)
+		if (expectedShift == shift)
 			return;
 
 
 		final int numberSize = number.size();
-		final int digitsShift = (expectedPow - shift) % countDigits;
+		final int digitsShift = (expectedShift - shift) % countDigits;
 		final long powRight = pow10(digitsShift);
 		final long powLeft = pow10(countDigits - digitsShift);
 
@@ -123,20 +144,29 @@ public class BigDouble
 			newNumber.add((el % powLeft) * powRight);
 		}
 
-		for (int i = 0; i < (expectedPow - shift) / countDigits; i++)
+		for (int i = 0; i < (expectedShift - shift) / countDigits; i++)
 			newNumber.add(0L);
 
 		this.number = newNumber;
-		this.shift = expectedPow;
+		this.shift = expectedShift;
 	}
 
-
+	/**
+	 * Copy constructor
+	 * @param _Other must be not null
+	 */
 	public BigDouble(BigDouble _Other)
 	{
+		if (_Other == null)
+			throw new NullPointerException("Copying uninitialized object");
 		this.shift = _Other.shift;
 		this.number = new Vector<>(_Other.number);
 	}
 
+	/**
+	 * The number creates by a string
+	 * @param str is some string
+	 */
 	public BigDouble(String str)
 	{
 		if (!str.matches("^-?(\\d+.?\\d*)|(\\d*.?\\d+)$"))
@@ -148,7 +178,7 @@ public class BigDouble
 		String inputString = str.replaceAll("[-.]", "");
 
 
-		//---Filling-------------------------------->
+		//---Filling-------------------------------------->
 		final int inputStringLength = inputString.length();
 		int leftThr = 0;
 		int nextThr = inputStringLength % countDigits;
@@ -169,11 +199,19 @@ public class BigDouble
 			toNegative();
 	}
 
+	/**
+	 * Constructor by default
+	 * The number equals zero
+	 */
 	public BigDouble()
 	{
 		number.add(0L);
 	}
 
+	/**
+	 * The number creates by a long number
+	 * @param value is some {@code long} number
+	 */
 	public BigDouble(long value)
 	{
 		long thr = pow10(countDigits);
@@ -186,6 +224,12 @@ public class BigDouble
 		number.add(value % thr);
 	}
 
+	/**
+	 * The number creates by a double number
+	 * Warning: double format has low precision
+	 * Better creating from string
+	 * @param value is some {@code double} number
+	 */
 	public BigDouble(double value)
 	{
 		String strDouble = String.valueOf(value);
@@ -201,6 +245,13 @@ public class BigDouble
 		zeroCleaner();
 	}
 
+	/**
+	 * Calculates sum of two numbers
+	 * The numbers must be alignment by a number of digits after dot
+	 * Uses method changeShift()
+	 * @param _Other is some Number
+	 * @return a sum of those numbers
+	 */
 	public BigDouble plus(BigDouble _Other)
 	{
 		BigDouble result = new BigDouble();
@@ -277,6 +328,13 @@ public class BigDouble
 		return result;
 	}
 
+	/**
+	 * Calculates difference of two numbers
+	 * Difference is sum with a invert sign number
+	 * Uses method invert()
+	 * @param _Other is some number
+	 * @return a difference of the numbers
+	 */
 	public BigDouble minus(BigDouble _Other)
 	{
 		_Other.invert();
@@ -285,6 +343,13 @@ public class BigDouble
 		return tmp;
 	}
 
+	/**
+	 * Calculates a multiplications of two numbers
+	 * Multiplications is repeating of a sum
+	 * Uses method plus()
+	 * @param _Other is some number
+	 * @return a multiplications of the numbers
+	 */
 	public BigDouble multiply(BigDouble _Other)
 	{
 		int shortCountDigits = countDigits / 2;
@@ -354,7 +419,9 @@ public class BigDouble
 		return result;
 	}
 
-
+	/**
+	 * Inverts a sign of the number
+	 */
 	public void invert()
 	{
 		int numberSize = number.size();
@@ -362,30 +429,47 @@ public class BigDouble
 			number.set(i, -number.get(i));
 	}
 
+	/**
+	 * Converts the number to negative
+	 * Negative number remains negative
+	 */
 	public void toNegative()
 	{
 		if (!this.isNegative())
 			invert();
 	}
 
+	/**
+	 * Converts the number to positive
+	 * Positive number remains positive
+	 */
 	public void toPositive()
 	{
 		if (!this.isPositive())
 			invert();
 	}
 
-
+	/**
+	 * Checks the number to positive
+	 * @return is positive number
+	 */
 	public boolean isPositive()
 	{
 		return number.get(0) >= 0;
 	}
 
+	/**
+	 * Checks the number to negative
+	 * @return is negative number
+	 */
 	public boolean isNegative()
 	{
 		return number.get(0) < 0;
 	}
 
-
+	/**
+	 * @return string representation of a number
+	 */
 	@Override
 	public String toString()
 	{
@@ -414,6 +498,10 @@ public class BigDouble
 		return negativeStr + strResult.substring(0, strLength - shift) + "." + strResult.substring(strLength - shift);
 	}
 
+	/**
+	 * @param _Obj is some number
+	 * @return are two numbers equal
+	 */
 	@Override
 	public boolean equals(Object _Obj)
 	{
@@ -441,6 +529,9 @@ public class BigDouble
 		return false;
 	}
 
+	/**
+	 * @return a hash code
+	 */
 	@Override
 	public int hashCode()
 	{
