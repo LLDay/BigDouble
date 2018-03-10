@@ -1,8 +1,7 @@
 package bigdouble;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.File;
+import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -125,22 +124,18 @@ public class Test
 	public void realBigDouble()
 	{
 		StringBuilder strBuild = new StringBuilder();
+
 		try
 		{
-			FileReader piFile = new FileReader("Pi.txt");
-			BufferedReader piBuff = new BufferedReader(piFile);
-			while (true)
-			{
-				String line = piBuff.readLine();
-				if (line == null) break;
-				strBuild.append(line);
-			}
-			piBuff.close();
-			piFile.close();
+			Scanner piScan = new Scanner(new File("Pi.txt"));
+
+			while(piScan.hasNext())
+				strBuild.append(piScan.next());
+
+			piScan.close();
 		}
-		catch(IOException ex)
+		catch(Exception e)
 		{
-			return;
 		}
 
 		assertFalse(isThrowingCase(strBuild.toString()));
@@ -168,5 +163,30 @@ public class Test
 
 		assertTrue(a.multiply(zero).equals(zero));
 		assertTrue(a.multiply(minus).equals(negativeA));
+	}
+
+	@org.junit.jupiter.api.Test
+	public void power()
+	{
+		BigDouble two = new BigDouble(2);
+		assertTrue(two.toPower(10).equals(1024));
+
+		//calculated by Calculator.net
+		assertTrue(two.toPower(100).toString().equals("1267650600228229401496703205376"));
+		assertTrue(two.toPower(1000).toString().equals(
+				"10715086071862673209484250490600018105614048117055336074" +
+				"437503883703510511249361224931983788156958581275946729175" +
+				"531468251871452856923140435984577574698574803934567774824230985421" +
+				"074605062371141877954182153046474983581941267398767559165" +
+				"543946077062914571196477686542167660429831652624386837205668069376"));
+		assertTrue(new BigDouble(-3.21).toPower(21).toString().equals(
+				"-43311744900.090301286724494444108707461503586489350721"));
+
+		BigDouble nTwo = new BigDouble(-2);
+		assertTrue(nTwo.toPower(3).plus(nTwo.toPower(2)).equals(-4));
+
+		BigDouble someNum = new BigDouble("01651560606031.0653165419000");
+		assertTrue(someNum.toPower(0).equals(1));
+		assertTrue(someNum.toPower(1).equals(someNum));
 	}
 }

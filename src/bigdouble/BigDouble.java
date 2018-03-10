@@ -1,5 +1,7 @@
 package bigdouble;
 
+import javax.naming.LimitExceededException;
+import javax.naming.SizeLimitExceededException;
 import java.lang.IllegalArgumentException;
 import java.util.ListIterator;
 import java.util.Vector;
@@ -52,7 +54,7 @@ public class BigDouble
 
 	/**
 	 * Erases zeroes from the array
-	 * on the right and left
+	 * on the right and the left
 	 */
 	private void zeroCleaner()
 	{
@@ -149,6 +151,22 @@ public class BigDouble
 
 		this.number = newNumber;
 		this.shift = expectedShift;
+	}
+
+	/**
+ 	 * @param numb is some long number
+	 * @return min divisor of a number
+	 */
+	public long minDivisor(long numb)
+	{
+		if (numb % 2 == 0)
+			return 2L;
+		long tmp = 3;
+		long thr = (long)sqrt(numb);
+
+		while(tmp < thr && numb % tmp != 0) tmp += 2;
+		if (numb % tmp != 0) return numb;
+		return tmp;
 	}
 
 	/**
@@ -417,6 +435,27 @@ public class BigDouble
 		result.shift = this.shift + _Other.shift;
 		result.zeroCleaner();
 		return result;
+	}
+
+	/**
+	 * Powering is repeating of a multiply
+	 * @param pow is some non-negative number
+	 * @return this number to the power pow
+	 */
+	public BigDouble toPower(long pow)
+	{
+		if (pow < 0)
+			throw new IllegalArgumentException("Unacceptable power");
+
+		if (pow == 0)
+			return new BigDouble(1);
+
+		long minDiv = minDivisor(pow);
+		if (minDiv == pow)
+			return this.toPower(pow - 1).multiply(this);
+
+		BigDouble res = new BigDouble(this.toPower(minDiv));
+		return res.toPower(pow / minDiv);
 	}
 
 	/**
