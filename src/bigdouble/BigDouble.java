@@ -1,10 +1,8 @@
 package bigdouble;
 
-import javax.naming.LimitExceededException;
-import javax.naming.SizeLimitExceededException;
 import java.lang.IllegalArgumentException;
+import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.Vector;
 
 import static java.lang.Math.*;
 
@@ -40,7 +38,7 @@ public class BigDouble
 	 * @param e is power
 	 * @return round number
 	 */
-	private static long pow10(long e)
+	public static long pow10(long e)
 	{
 		if (e < 0)
 			throw new IllegalArgumentException("Unacceptable power");
@@ -50,6 +48,7 @@ public class BigDouble
 			result *= 10;
 
 		return result;
+
 	}
 
 	/**
@@ -70,7 +69,7 @@ public class BigDouble
 
 		if (rightNonZeroIndex < 0)
 		{
-			number = new Vector<>();
+			number = new ArrayList<>();
 			number.add(0L);
 			shift = 0;
 			return;
@@ -85,8 +84,8 @@ public class BigDouble
 		}
 
 
-		//---Shifting-------------------------->
-		Vector<Long> newNumber = new Vector<>();
+		//---Shifting-------------------------------->
+		ArrayList<Long> newNumber = new ArrayList<>();
 
 		if (digitsShift != 0)
 		{
@@ -112,8 +111,8 @@ public class BigDouble
 		while (it.hasNext() && it.next() == 0)
 			leftThrIndex++;
 
-		//---Filling----------------------------------------------------------------->
-		number = new Vector<>(newNumber.subList(leftThrIndex, rightNonZeroIndex + 1));
+		//---Filling-------------------------------------------------------------------->
+		number = new ArrayList<>(newNumber.subList(leftThrIndex, rightNonZeroIndex + 1));
 		shift -= digitsShift + rightThrIndex * countDigits;
 	}
 
@@ -137,12 +136,13 @@ public class BigDouble
 		final long powRight = pow10(digitsShift);
 		final long powLeft = pow10(countDigits - digitsShift);
 
-		Vector<Long> newNumber = new Vector<>();
+		ArrayList<Long> newNumber = new ArrayList<>();
 		newNumber.add(0L);
 
 		for (Long el : number)
 		{
-			newNumber.set(newNumber.size() - 1, newNumber.lastElement() + el / powLeft);
+			int lastIndex = newNumber.size() - 1;
+			newNumber.set(lastIndex, newNumber.get(lastIndex) + el / powLeft);
 			newNumber.add((el % powLeft) * powRight);
 		}
 
@@ -155,9 +155,9 @@ public class BigDouble
 
 	/**
  	 * @param numb is some long number
-	 * @return min divisor of a number
+	 * @return min divisor of a number (not 1)
 	 */
-	public long minDivisor(long numb)
+	private static long minDivisor(long numb)
 	{
 		if (numb % 2 == 0)
 			return 2L;
@@ -178,7 +178,7 @@ public class BigDouble
 		if (_Other == null)
 			throw new NullPointerException("Copying uninitialized object");
 		this.shift = _Other.shift;
-		this.number = new Vector<>(_Other.number);
+		this.number = new ArrayList<>(_Other.number);
 	}
 
 	/**
@@ -282,8 +282,8 @@ public class BigDouble
 
 		result.shift = maxPow;
 
-		Vector<Long> maxList;
-		Vector<Long> minList;
+		ArrayList<Long> maxList;
+		ArrayList<Long> minList;
 
 		if (this.number.size() > _Other.number.size())
 		{
@@ -302,7 +302,7 @@ public class BigDouble
 		final long thr = pow10(countDigits);
 
 		if (sizeDiff != 0)
-			result.number = new Vector<>(maxList.subList(0, sizeDiff));
+			result.number = new ArrayList<>(maxList.subList(0, sizeDiff));
 
 		for (int i = 0; i < minListSize; i++)
 		{
@@ -310,7 +310,8 @@ public class BigDouble
 
 			if (abs(buff) > thr)
 			{
-				result.number.set(result.number.size() - 1, result.number.lastElement() + buff / abs(buff));
+				int lastIndex = result.number.size() - 1;
+				result.number.set(lastIndex, result.number.get(lastIndex) + buff / abs(buff));
 				buff %= thr;
 			}
 
@@ -373,8 +374,8 @@ public class BigDouble
 		int shortCountDigits = countDigits / 2;
 		long thr = pow10(shortCountDigits);
 
-		Vector<Long> firstNum = new Vector<>();
-		Vector<Long> secondNum = new Vector<>();
+		ArrayList<Long> firstNum = new ArrayList<>();
+		ArrayList<Long> secondNum = new ArrayList<>();
 
 		for (Long el : this.number)
 		{
@@ -399,7 +400,7 @@ public class BigDouble
 
 		if (zeroSecondNum > zeroFirstNum)
 		{
-			Vector<Long> tmp = firstNum;
+			ArrayList<Long> tmp = firstNum;
 			firstNum = secondNum;
 			secondNum = tmp;
 		}
@@ -579,7 +580,7 @@ public class BigDouble
 
 	//---Private data-------------------------------------------------------->
 	private static final int countDigits = getCountDigits(Long.MAX_VALUE) - 1;
-	private Vector<Long> number = new Vector<>();
+	private ArrayList<Long> number = new ArrayList<>();
 	private int shift = 0;
 }
 

@@ -1,8 +1,5 @@
 package bigdouble;
 
-import java.io.File;
-import java.util.Scanner;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -118,27 +115,6 @@ public class Test
 		//from plus test
 		assertTrue(b.minus(c).equals(new BigDouble("16321650516208466109702622457.388140902666749575341466735282428749411052468975383867831543586783223")));
 		assertTrue(b.minus(d).equals(new BigDouble("-78946513241634891566025945598936810360804.016074691680865498874161443607396261429")));
-	}
-
-	@org.junit.jupiter.api.Test
-	public void realBigDouble()
-	{
-		StringBuilder strBuild = new StringBuilder();
-
-		try
-		{
-			Scanner piScan = new Scanner(new File("Pi.txt"));
-
-			while(piScan.hasNext())
-				strBuild.append(piScan.next());
-
-			piScan.close();
-		}
-		catch(Exception e)
-		{
-		}
-
-		assertFalse(isThrowingCase(strBuild.toString()));
 	}
 
 	@org.junit.jupiter.api.Test
