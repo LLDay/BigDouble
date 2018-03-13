@@ -171,14 +171,14 @@ public class BigDouble
 
 	/**
 	 * Copy constructor
-	 * @param _Other must be not null
+	 * @param other must be not null
 	 */
-	public BigDouble(BigDouble _Other)
+	public BigDouble(BigDouble other)
 	{
-		if (_Other == null)
+		if (other == null)
 			throw new NullPointerException("Copying uninitialized object");
-		this.shift = _Other.shift;
-		this.number = new ArrayList<>(_Other.number);
+		this.shift = other.shift;
+		this.number = new ArrayList<>(other.number);
 	}
 
 	/**
@@ -267,32 +267,32 @@ public class BigDouble
 	 * Calculates sum of two numbers
 	 * The numbers must be alignment by a number of digits after dot
 	 * Uses method changeShift()
-	 * @param _Other is some Number
+	 * @param other is some Number
 	 * @return a sum of those numbers
 	 */
-	public BigDouble plus(BigDouble _Other)
+	public BigDouble plus(BigDouble other)
 	{
 		BigDouble result = new BigDouble();
 
 		//---Alignment---------------------------->
-		int maxPow = max(this.shift, _Other.shift);
-		if (this.shift >= _Other.shift)
-			_Other.changeShift(this.shift);
-		else this.changeShift(_Other.shift);
+		int maxPow = max(this.shift, other.shift);
+		if (this.shift >= other.shift)
+			other.changeShift(this.shift);
+		else this.changeShift(other.shift);
 
 		result.shift = maxPow;
 
 		ArrayList<Long> maxList;
 		ArrayList<Long> minList;
 
-		if (this.number.size() > _Other.number.size())
+		if (this.number.size() > other.number.size())
 		{
 			maxList = this.number;
-			minList = _Other.number;
+			minList = other.number;
 		}
 		else
 		{
-			maxList = _Other.number;
+			maxList = other.number;
 			minList = this.number;
 		}
 
@@ -342,7 +342,7 @@ public class BigDouble
 
 		result.zeroCleaner();
 		this.zeroCleaner();
-		_Other.zeroCleaner();
+		other.zeroCleaner();
 
 		return result;
 	}
@@ -351,14 +351,14 @@ public class BigDouble
 	 * Calculates difference of two numbers
 	 * Difference is sum with a invert sign number
 	 * Uses method invert()
-	 * @param _Other is some number
+	 * @param other is some number
 	 * @return a difference of the numbers
 	 */
-	public BigDouble minus(BigDouble _Other)
+	public BigDouble minus(BigDouble other)
 	{
-		_Other.invert();
-		BigDouble tmp = this.plus(_Other);
-		_Other.invert();
+		other.invert();
+		BigDouble tmp = this.plus(other);
+		other.invert();
 		return tmp;
 	}
 
@@ -366,10 +366,10 @@ public class BigDouble
 	 * Calculates a multiplications of two numbers
 	 * Multiplications is repeating of a sum
 	 * Uses method plus()
-	 * @param _Other is some number
+	 * @param other is some number
 	 * @return a multiplications of the numbers
 	 */
-	public BigDouble multiply(BigDouble _Other)
+	public BigDouble multiply(BigDouble other)
 	{
 		int shortCountDigits = countDigits / 2;
 		long thr = pow10(shortCountDigits);
@@ -382,7 +382,7 @@ public class BigDouble
 			firstNum.add(el / thr);
 			firstNum.add(el % thr);
 		}
-		for (Long el : _Other.number)
+		for (Long el : other.number)
 		{
 			secondNum.add(el / thr);
 			secondNum.add(el % thr);
@@ -433,7 +433,7 @@ public class BigDouble
 				result = result.plus(tmp);
 			}
 
-		result.shift = this.shift + _Other.shift;
+		result.shift = this.shift + other.shift;
 		result.zeroCleaner();
 		return result;
 	}
@@ -539,32 +539,32 @@ public class BigDouble
 	}
 
 	/**
-	 * @param _Obj is some number
+	 * @param obj is some number
 	 * @return are two numbers equal
 	 */
 	@Override
-	public boolean equals(Object _Obj)
+	public boolean equals(Object obj)
 	{
-		if (_Obj == null)
+		if (obj == null)
 			return false;
 
-		if (_Obj == this)
+		if (obj == this)
 			return true;
 
-		if (_Obj instanceof BigDouble && toString().equals(_Obj.toString()))
+		if (obj instanceof BigDouble && toString().equals(obj.toString()))
 			return true;
 
-		if (_Obj instanceof Long)
-			return this.equals(new BigDouble((Long)_Obj));
+		if (obj instanceof Long)
+			return this.equals(new BigDouble((Long)obj));
 
-		if (_Obj instanceof Integer)
-			return this.equals(new BigDouble(((Integer)_Obj).longValue()));
+		if (obj instanceof Integer)
+			return this.equals(new BigDouble(((Integer)obj).longValue()));
 
-		if (_Obj instanceof Double)
-			return this.equals(new BigDouble((Double)_Obj));
+		if (obj instanceof Double)
+			return this.equals(new BigDouble((Double)obj));
 
-		if (_Obj instanceof Float)
-			return this.equals(new BigDouble(((Float)_Obj).doubleValue()));
+		if (obj instanceof Float)
+			return this.equals(new BigDouble(((Float)obj).doubleValue()));
 
 		return false;
 	}
