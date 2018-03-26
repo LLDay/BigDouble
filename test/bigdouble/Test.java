@@ -131,14 +131,14 @@ public class Test
 		negativeA.toNegative();
 
 		//calculated by Calculator.net
-		assertTrue(a.multiply(b).toString().equals("92728427483464146389789695102918447474114." +
+		assertTrue(a.times(b).toString().equals("92728427483464146389789695102918447474114." +
 				"321732098387541709777903741240815689"));
-		assertTrue(b.multiply(c).toString().equals("-510837803383335370497109744599955802." +
+		assertTrue(b.times(c).toString().equals("-510837803383335370497109744599955802." +
 				"89128622771707455487405029739654509590731"));
-		assertTrue(d.multiply(d).toString().equals("9999999999999998.0000000000000001"));
+		assertTrue(d.times(d).toString().equals("9999999999999998.0000000000000001"));
 
-		assertTrue(a.multiply(zero).equals(zero));
-		assertTrue(a.multiply(minus).equals(negativeA));
+		assertTrue(a.times(zero).equals(zero));
+		assertTrue(a.times(minus).equals(negativeA));
 	}
 
 	@org.junit.jupiter.api.Test
@@ -160,6 +160,8 @@ public class Test
 
 		BigDouble nTwo = new BigDouble(-2);
 		assertTrue(nTwo.toPower(3).plus(nTwo.toPower(2)).equals(-4));
+
+
 
 		BigDouble someNum = new BigDouble("01651560606031.0653165419000");
 		assertTrue(someNum.toPower(0).equals(1));

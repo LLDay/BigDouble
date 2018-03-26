@@ -131,7 +131,6 @@ public class BigDouble
 			return;
 
 
-		final int numberSize = number.size();
 		final int digitsShift = (expectedShift - shift) % countDigits;
 		final long powRight = pow10(digitsShift);
 		final long powLeft = pow10(countDigits - digitsShift);
@@ -154,20 +153,31 @@ public class BigDouble
 	}
 
 	/**
- 	 * @param numb is some long number
-	 * @return min divisor of a number (not 1)
+	 * @return count digits of the number
 	 */
-	private static long minDivisor(long numb)
+	private int getCountDigitsNumber()
 	{
-		if (numb % 2 == 0)
-			return 2L;
-		long tmp = 3;
-		long thr = (long)sqrt(numb);
-
-		while(tmp < thr && numb % tmp != 0) tmp += 2;
-		if (numb % tmp != 0) return numb;
-		return tmp;
+		//1000000 -> number = {1}, shift = -6
+		int negShift = shift < 0 ? -shift : 0;
+		return getCountDigits(number.get(0)) + countDigits * (number.size() - 1) + negShift;
 	}
+
+	private int getDigitIndex(int index)
+	{
+		if (getCountDigitsNumber() >= index || index < 0)
+			throw new IndexOutOfBoundsException("Wrong digit position");
+
+		final int firstCountDigits = getCountDigits((number.get(0)));
+		final int currBlockIndex = ((index - firstCountDigits) / countDigits);
+		final long currBlock = number.get(currBlockIndex);
+
+		if (index < firstCountDigits)
+			return (int)(currBlock / (firstCountDigits - index)) % 10;
+
+		return (int)(currBlock / (countDigits - index % countDigits)) % 10;
+	}
+
+
 
 	/**
 	 * Copy constructor
@@ -369,7 +379,7 @@ public class BigDouble
 	 * @param other is some number
 	 * @return a multiplications of the numbers
 	 */
-	public BigDouble multiply(BigDouble other)
+	public BigDouble times(BigDouble other)
 	{
 		int shortCountDigits = countDigits / 2;
 		long thr = pow10(shortCountDigits);
@@ -445,18 +455,18 @@ public class BigDouble
 	 */
 	public BigDouble toPower(long pow)
 	{
-		if (pow < 0)
-			throw new IllegalArgumentException("Unacceptable power");
+		BigDouble res = new BigDouble(1);
+		BigDouble base = new BigDouble(this);
+		while (pow > 0)
+		{
+			if (pow % 2 == 1)
+				res = res.times(base);
 
-		if (pow == 0)
-			return new BigDouble(1);
+			base = base.times(base);
+			pow /= 2;
+		}
 
-		long minDiv = minDivisor(pow);
-		if (minDiv == pow)
-			return this.toPower(pow - 1).multiply(this);
-
-		BigDouble res = new BigDouble(this.toPower(minDiv));
-		return res.toPower(pow / minDiv);
+		return res;
 	}
 
 	/**
@@ -583,4 +593,3 @@ public class BigDouble
 	private ArrayList<Long> number = new ArrayList<>();
 	private int shift = 0;
 }
-
