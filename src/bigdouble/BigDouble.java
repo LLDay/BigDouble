@@ -162,22 +162,23 @@ public class BigDouble
 		return getCountDigits(number.get(0)) + countDigits * (number.size() - 1) + negShift;
 	}
 
-	private int getDigitIndex(int index)
+	/**
+	 * Gets a substring for rounding
+	 * @param precision is count of digits after dot
+	 * @return rounding substring
+	 */
+	private String roundingNumber(int precision)
 	{
-		if (getCountDigitsNumber() >= index || index < 0)
-			throw new IndexOutOfBoundsException("Wrong digit position");
+		final String str = toString();
+		final int dotIndex = toString().indexOf('.');
 
-		final int firstCountDigits = getCountDigits((number.get(0)));
-		final int currBlockIndex = ((index - firstCountDigits) / countDigits);
-		final long currBlock = number.get(currBlockIndex);
+		if (dotIndex == -1)
+			return str + ".0";
 
-		if (index < firstCountDigits)
-			return (int)(currBlock / (firstCountDigits - index)) % 10;
-
-		return (int)(currBlock / (countDigits - index % countDigits)) % 10;
+		if (str.length() > dotIndex + precision)
+			return str.substring(0, dotIndex + precision + 1);
+		else return str.substring(0, str.length()) + '0';
 	}
-
-
 
 	/**
 	 * Copy constructor
@@ -357,6 +358,7 @@ public class BigDouble
 		return result;
 	}
 
+
 	/**
 	 * Calculates difference of two numbers
 	 * Difference is sum with a invert sign number
@@ -515,6 +517,54 @@ public class BigDouble
 	public boolean isNegative()
 	{
 		return number.get(0) < 0;
+	}
+
+	/**
+	 * Rounding down
+	 * @param precision is count digits after dot
+	 * @return a rounding number
+	 */
+	public BigDouble floor(int precision)
+	{
+		return new BigDouble(roundingNumber(precision));
+	}
+
+	/**
+	 * Rounding up
+	 * @param precision is count digits after dot
+	 * @return a rounding number
+	 */
+	public BigDouble ceil(int precision)
+	{
+		final String str = roundingNumber(precision + 1);
+		if (str.charAt(str.length() - 1) != '0')
+		{
+			BigDouble plusVal = new BigDouble(0.1).toPower(precision);
+			if (this.isNegative())
+				plusVal.toNegative();
+
+			return new BigDouble(str.substring(0, str.length() - 1)).plus(plusVal);
+		}
+		else return new BigDouble(str.substring(0, str.length() - 1));
+	}
+
+	/**
+	 * Rounding on math rules
+	 * @param precision is count digits after dot
+	 * @return a rounding number
+	 */
+	public BigDouble round(int precision)
+	{
+		final String str = roundingNumber(precision + 1);
+		if (str.charAt(str.length() - 1) >= '5')
+		{
+			BigDouble plusVal = new BigDouble(0.1).toPower(precision);
+			if (this.isNegative())
+				plusVal.toNegative();
+
+			return new BigDouble(str.substring(0, str.length() - 1)).plus(plusVal);
+		}
+		else return new BigDouble(str.substring(0, str.length() - 1));
 	}
 
 	/**

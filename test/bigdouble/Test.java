@@ -167,4 +167,79 @@ public class Test
 		assertTrue(someNum.toPower(0).equals(1));
 		assertTrue(someNum.toPower(1).equals(someNum));
 	}
+
+	@org.junit.jupiter.api.Test
+	public void floor()
+	{
+		BigDouble a = new BigDouble(123.456789);
+		BigDouble b = new BigDouble(-43);
+		BigDouble c = new BigDouble(-12.18);
+
+		assertTrue(a.floor(0).equals(123));
+		assertTrue(a.floor(1).equals(123.4));
+		assertTrue(a.floor(2).equals(123.45));
+		assertTrue(a.floor(3).equals(123.456));
+		assertTrue(a.floor(4).equals(123.4567));
+		assertTrue(a.floor(5).equals(123.45678));
+		assertTrue(a.floor(6).equals(123.456789));
+		assertTrue(a.floor(7).equals(123.456789));
+
+		assertTrue(b.floor(0).equals(-43));
+		assertTrue(b.floor(1).equals(-43));
+
+		assertTrue(c.floor(0).equals(-12));
+		assertTrue(c.floor(1).equals(-12.1));
+		assertTrue(c.floor(2).equals(-12.18));
+		assertTrue(c.floor(3).equals(-12.18));
+	}
+
+	@org.junit.jupiter.api.Test
+	public void ceil()
+	{
+		BigDouble a = new BigDouble(123.4567809);
+		BigDouble b = new BigDouble(-43);
+		BigDouble c = new BigDouble(-12.18);
+
+		assertTrue(a.ceil(0).equals(124));
+		assertTrue(a.ceil(1).equals(123.5));
+		assertTrue(a.ceil(2).equals(123.46));
+		assertTrue(a.ceil(3).equals(123.457));
+		assertTrue(a.ceil(4).equals(123.4568));
+		assertTrue(a.ceil(5).equals(123.45678));
+		assertTrue(a.ceil(6).equals(123.456781));
+		assertTrue(a.ceil(7).equals(123.4567809));
+		assertTrue(a.ceil(8).equals(123.4567809));
+
+		assertTrue(b.ceil(0).equals(-43));
+		assertTrue(b.ceil(1).equals(-43));
+
+		assertTrue(c.ceil(0).equals(-13));
+		assertTrue(c.ceil(1).equals(-12.2));
+		assertTrue(c.ceil(2).equals(-12.18));
+		assertTrue(c.ceil(3).equals(-12.18));
+	}
+
+	@org.junit.jupiter.api.Test
+	public void round()
+	{
+		BigDouble a = new BigDouble(12.3456);
+		BigDouble b = new BigDouble(-43);
+		BigDouble c = new BigDouble(-12.538);
+
+		assertTrue(a.round(0).equals(12));
+		assertTrue(a.round(1).equals(12.3));
+		assertTrue(a.round(2).equals(12.35));
+		assertTrue(a.round(3).equals(12.346));
+		assertTrue(a.round(4).equals(12.3456));
+		assertTrue(a.round(5).equals(12.3456));
+
+		assertTrue(b.round(0).equals(-43));
+		assertTrue(b.round(1).equals(-43));
+
+		assertTrue(c.round(0).equals(-13));
+		assertTrue(c.round(1).equals(-12.5));
+		assertTrue(c.round(2).equals(-12.54));
+		assertTrue(c.round(3).equals(-12.538));
+		assertTrue(c.round(4).equals(-12.538));
+	}
 }
