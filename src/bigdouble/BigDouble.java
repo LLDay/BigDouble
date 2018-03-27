@@ -374,7 +374,7 @@ public class BigDouble
 		return tmp;
 	}
 
-	private ArrayList<Long> halfSpliting(ArrayList<Long> array)
+	private ArrayList<Long> halfSplitting(ArrayList<Long> array)
 	{
 		ArrayList<Long> result = new ArrayList<>();
 		long thr = pow10(countDigits / 2);
@@ -398,8 +398,8 @@ public class BigDouble
 	{
 		int shortCountDigits = countDigits / 2;
 
-		ArrayList<Long> firstNum = halfSpliting(this.number);
-		ArrayList<Long> secondNum = halfSpliting(other.number);
+		ArrayList<Long> firstNum = halfSplitting(this.number);
+		ArrayList<Long> secondNum = halfSplitting(other.number);
 
 		int zeroFirstNum = 0;
 		for (Long el : firstNum)
@@ -527,6 +527,9 @@ public class BigDouble
 	 */
 	public BigDouble floor(int precision)
 	{
+		if (precision < 0)
+			throw new IllegalArgumentException("Wrong rounding");
+
 		return new BigDouble(roundingNumber(precision));
 	}
 
@@ -537,6 +540,9 @@ public class BigDouble
 	 */
 	public BigDouble round(int precision)
 	{
+		if (precision < 0)
+			throw new IllegalArgumentException("Wrong rounding");
+
 		final String str = roundingNumber(precision + 1);
 		if (str.charAt(str.length() - 1) >= '5')
 		{
