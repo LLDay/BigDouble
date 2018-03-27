@@ -194,32 +194,6 @@ public class Test
 	}
 
 	@org.junit.jupiter.api.Test
-	public void ceil()
-	{
-		BigDouble a = new BigDouble(123.4567809);
-		BigDouble b = new BigDouble(-43);
-		BigDouble c = new BigDouble(-12.18);
-
-		assertTrue(a.ceil(0).equals(124));
-		assertTrue(a.ceil(1).equals(123.5));
-		assertTrue(a.ceil(2).equals(123.46));
-		assertTrue(a.ceil(3).equals(123.457));
-		assertTrue(a.ceil(4).equals(123.4568));
-		assertTrue(a.ceil(5).equals(123.45678));
-		assertTrue(a.ceil(6).equals(123.456781));
-		assertTrue(a.ceil(7).equals(123.4567809));
-		assertTrue(a.ceil(8).equals(123.4567809));
-
-		assertTrue(b.ceil(0).equals(-43));
-		assertTrue(b.ceil(1).equals(-43));
-
-		assertTrue(c.ceil(0).equals(-13));
-		assertTrue(c.ceil(1).equals(-12.2));
-		assertTrue(c.ceil(2).equals(-12.18));
-		assertTrue(c.ceil(3).equals(-12.18));
-	}
-
-	@org.junit.jupiter.api.Test
 	public void round()
 	{
 		BigDouble a = new BigDouble(12.3456);

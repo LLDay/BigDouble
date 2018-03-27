@@ -374,6 +374,19 @@ public class BigDouble
 		return tmp;
 	}
 
+	private ArrayList<Long> halfSpliting(ArrayList<Long> array)
+	{
+		ArrayList<Long> result = new ArrayList<>();
+		long thr = pow10(countDigits / 2);
+
+		for (Long el : array)
+		{
+			result.add(el / thr);
+			result.add(el % thr);
+		}
+		return result;
+	}
+
 	/**
 	 * Calculates a multiplications of two numbers
 	 * Multiplications is repeating of a sum
@@ -384,21 +397,9 @@ public class BigDouble
 	public BigDouble times(BigDouble other)
 	{
 		int shortCountDigits = countDigits / 2;
-		long thr = pow10(shortCountDigits);
 
-		ArrayList<Long> firstNum = new ArrayList<>();
-		ArrayList<Long> secondNum = new ArrayList<>();
-
-		for (Long el : this.number)
-		{
-			firstNum.add(el / thr);
-			firstNum.add(el % thr);
-		}
-		for (Long el : other.number)
-		{
-			secondNum.add(el / thr);
-			secondNum.add(el % thr);
-		}
+		ArrayList<Long> firstNum = halfSpliting(this.number);
+		ArrayList<Long> secondNum = halfSpliting(other.number);
 
 		int zeroFirstNum = 0;
 		for (Long el : firstNum)
@@ -527,25 +528,6 @@ public class BigDouble
 	public BigDouble floor(int precision)
 	{
 		return new BigDouble(roundingNumber(precision));
-	}
-
-	/**
-	 * Rounding up
-	 * @param precision is count digits after dot
-	 * @return a rounding number
-	 */
-	public BigDouble ceil(int precision)
-	{
-		final String str = roundingNumber(precision + 1);
-		if (str.charAt(str.length() - 1) != '0')
-		{
-			BigDouble plusVal = new BigDouble(0.1).toPower(precision);
-			if (this.isNegative())
-				plusVal.toNegative();
-
-			return new BigDouble(str.substring(0, str.length() - 1)).plus(plusVal);
-		}
-		else return new BigDouble(str.substring(0, str.length() - 1));
 	}
 
 	/**
