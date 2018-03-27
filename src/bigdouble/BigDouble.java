@@ -152,15 +152,6 @@ public class BigDouble
 		this.shift = expectedShift;
 	}
 
-	/**
-	 * @return count digits of the number
-	 */
-	private int getCountDigitsNumber()
-	{
-		//1000000 -> number = {1}, shift = -6
-		int negShift = shift < 0 ? -shift : 0;
-		return getCountDigits(number.get(0)) + countDigits * (number.size() - 1) + negShift;
-	}
 
 	/**
 	 * Gets a substring for rounding
@@ -283,6 +274,9 @@ public class BigDouble
 	 */
 	public BigDouble plus(BigDouble other)
 	{
+		if (other == null)
+			throw new NullPointerException("Adding uninitialized object");
+
 		BigDouble result = new BigDouble();
 
 		//---Alignment---------------------------->
@@ -368,6 +362,9 @@ public class BigDouble
 	 */
 	public BigDouble minus(BigDouble other)
 	{
+		if (other == null)
+			throw new NullPointerException("Subtracting uninitialized object");
+
 		other.invert();
 		BigDouble tmp = this.plus(other);
 		other.invert();
@@ -396,6 +393,9 @@ public class BigDouble
 	 */
 	public BigDouble times(BigDouble other)
 	{
+		if (other == null)
+			throw new NullPointerException("Multiplication uninitialized object");
+
 		int shortCountDigits = countDigits / 2;
 
 		ArrayList<Long> firstNum = halfSplitting(this.number);
