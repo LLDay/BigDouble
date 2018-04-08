@@ -37,7 +37,7 @@ public class BigDoubleTest {
 	}
 
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void zeroCleaner() {
 		BigDouble bd = new BigDouble("000123456789.987654321000");
 		assertTrue("123456789.987654321".equals(bd.toString()));
