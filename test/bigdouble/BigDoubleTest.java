@@ -1,9 +1,10 @@
 package bigdouble;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class Test {
-	@org.junit.jupiter.api.Test
+public class BigDoubleTest {
+	@Test
 	public void constructor() {
 		BigDouble zero = new BigDouble(0);
 		assertTrue(new BigDouble().equals(zero));
@@ -46,7 +47,7 @@ public class Test {
 		assertTrue(new BigDouble("100000000000000000000000000000").toString().equals("100000000000000000000000000000"));
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void plus() {
 		BigDouble max = new BigDouble(Long.MAX_VALUE);
 		BigDouble min = new BigDouble(Long.MIN_VALUE);
@@ -75,7 +76,7 @@ public class Test {
 		assertTrue(b.plus(c).equals(c.plus(b)));
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void minus() {
 		BigDouble b = new BigDouble("16321650516208466109702645626.0004565168654561065464541984956448040600");
 		//invert values
@@ -87,7 +88,7 @@ public class Test {
 		assertTrue(b.minus(d).equals(new BigDouble("-78946513241634891566025945598936810360804.016074691680865498874161443607396261429")));
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void multiply() {
 		BigDouble a = new BigDouble("101998877665544332211.112233445566778899");
 		BigDouble b = new BigDouble("909112233445566778899.998877665544332211");
@@ -110,7 +111,7 @@ public class Test {
 		assertTrue(a.times(minus).equals(negativeA));
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void power() {
 		BigDouble two = new BigDouble(2);
 		assertTrue(two.toPower(10).equals(new BigDouble(1024)));
@@ -134,7 +135,7 @@ public class Test {
 		assertTrue(someNum.toPower(1).equals(someNum));
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void floor() {
 		BigDouble a = new BigDouble(123.456789);
 		BigDouble b = new BigDouble(-43);
@@ -158,7 +159,7 @@ public class Test {
 		assertTrue(c.floor(3).toString().equals("-12.18"));
 	}
 
-	@org.junit.jupiter.api.Test
+	@Test
 	public void round() {
 		BigDouble a = new BigDouble(12.3456);
 		BigDouble b = new BigDouble(-43);

@@ -41,7 +41,7 @@ public class BigDouble {
 	 * @param e is power
 	 * @return round number
 	 */
-	public static long pow10(long e) {
+	private static long pow10(long e) {
 		if (e < 0)
 			throw new IllegalArgumentException("Unacceptable power");
 
@@ -111,7 +111,6 @@ public class BigDouble {
 		this.shift += digitsShift;
 	}
 
-
 	/**
 	 * Gets a substring for rounding
 	 *
@@ -159,7 +158,6 @@ public class BigDouble {
 		shift = (dotIndex == -1) ? 0 : (str.length() - 1) - dotIndex;
 		String inputString = str.replaceAll("[-.]", "");
 
-		//---Filling-------------------------------------->
 		final int inputStringLength = inputString.length();
 		int leftThr = 0;
 		int nextThr = inputStringLength % digitThr;
@@ -176,9 +174,7 @@ public class BigDouble {
 		normalization();
 		zeroCleaner();
 
-		//---Is negative--->>
-		if (isNeg)
-			toNegative();
+		if (isNeg) toNegative();
 	}
 
 	/**
@@ -228,7 +224,6 @@ public class BigDouble {
 		normalization();
 		zeroCleaner();
 	}
-
 
 	/**
 	 * Calculates sum of two numbers
@@ -560,7 +555,7 @@ public class BigDouble {
 		return toString().hashCode();
 	}
 
-	//---Private data-------------------------------------------------------->
+	//---Private data----------------------------------------------------->
 	private static final int digitThr = getCountDigits(Long.MAX_VALUE) - 1;
 	private ArrayList<Long> number = new ArrayList<>();
 	private int shift = 0;
